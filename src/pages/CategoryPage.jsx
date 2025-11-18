@@ -9,16 +9,21 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true; // prevent state update after unmount
+
     async function load() {
       setLoading(true);
 
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .eq("category", category);
+        .eq("category", category)
+        .order("created_at", { ascending: false });
+
+      if (!active) return;
 
       if (error) {
-        console.error("Supabase Error:", error);
+        console.error("Supabase Error:", error.message);
         setProducts([]);
       } else {
         setProducts(data || []);
@@ -28,6 +33,10 @@ export default function CategoryPage() {
     }
 
     load();
+
+    return () => {
+      active = false; // clean-up
+    };
   }, [category]);
 
   return (
