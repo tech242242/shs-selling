@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../firebase/config";
+import { supabase } from "../supabase/client";
 
 export default function EditProduct() {
   const { id } = useParams();
@@ -11,9 +9,13 @@ export default function EditProduct() {
 
   useEffect(() => {
     async function fetchProduct() {
-      const refDoc = doc(db, "products", id);
-      const snap = await getDoc(refDoc);
-      if (snap.exists()) setProduct({ id: snap.id, ...snap.data() });
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (error) console.error(error);
+      else setProduct(data);
     }
     fetchProduct();
   }, [id]);
@@ -21,34 +23,23 @@ export default function EditProduct() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct(prev => ({ ...prev, [name]: value }));
-  }
-
-  const handleImageChange = async (e) => {
-    const files = Array.from(e.target.files);
-    setUploading(true);
-    const urls = [];
-    for (let file of files) {
-      const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
-      const uploadTask = await uploadBytesResumable(storageRef, file);
-      const downloadURL = await getDownloadURL(uploadTask.ref);
-      urls.push(downloadURL);
-    }
-    setProduct(prev => ({ ...prev, images: [...prev.images, ...urls] }));
-    setUploading(false);
-  }
+  };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!product) return;
     try {
-      const refDoc = doc(db, "products", id);
-      await updateDoc(refDoc, { ...product, price: Number(product.price) });
+      const { error } = await supabase
+        .from("products")
+        .update({ ...product, price: Number(product.price) })
+        .eq("id", id);
+      if (error) throw error;
       alert("Product updated successfully!");
     } catch (err) {
       console.error(err);
       alert("Error updating product!");
     }
-  }
+  };
 
   if (!product) return <p>Loading product...</p>;
 
@@ -64,11 +55,10 @@ export default function EditProduct() {
         <input type="text" name="location" value={product.location} onChange={handleChange} placeholder="Location" className="p-2 rounded bg-gray-800 text-white"/>
         <input type="text" name="sellerNumber" value={product.sellerNumber} onChange={handleChange} placeholder="Seller Phone" className="p-2 rounded bg-gray-800 text-white"/>
         <textarea name="description" value={product.description} onChange={handleChange} placeholder="Description" className="p-2 rounded bg-gray-800 text-white"/>
-        <input type="file" multiple accept="image/*" onChange={handleImageChange} className="p-2 rounded bg-gray-800 text-white"/>
         <button type="submit" disabled={uploading} className="bg-bt-red text-black p-2 rounded font-semibold mt-2">
           {uploading ? "Updating..." : "Update Product"}
         </button>
       </form>
     </div>
-  )
+  );
 }
