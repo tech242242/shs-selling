@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { supabase } from "../supabase/client";
 import { Link } from "react-router-dom";
 
 export default function ProductsList() {
@@ -10,21 +9,29 @@ export default function ProductsList() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setProducts(items);
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("timestamp", { ascending: false });
+      if (error) throw error;
+      setProducts(data || []);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure to delete this product?")) return;
-    await deleteDoc(doc(db, "products", id));
-    fetchProducts();
-  }
+    try {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (error) throw error;
+      fetchProducts();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
 
   useEffect(() => { fetchProducts(); }, []);
 
@@ -57,5 +64,5 @@ export default function ProductsList() {
         </tbody>
       </table>
     </div>
-  )
+  );
 }
