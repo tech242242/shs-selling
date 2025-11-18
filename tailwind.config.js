@@ -208,4 +208,18 @@ export default {
       addUtilities(newUtilities, ['responsive', 'hover'])
     }
   ]
-}
+} keyframes: {
+  float: {
+    '0%, 100%': { transform: 'translateY(0px) rotate(0deg) scale(1)' },
+    '33%': { transform: 'translateY(-15px) rotate(1deg) scale(1.02)' },
+    '66%': { transform: 'translateY(-8px) rotate(-1deg) scale(1.01)' }
+  },
+  'float-slow': {
+    '0%, 100%': { transform: 'translateY(0px) scale(1)' },
+    '50%': { transform: 'translateY(-25px) scale(1.03)' }
+  },
+  'gradient-shift': {   // ✔ FIXED NAME
+    '0%, 100%': { backgroundPosition: '0% 50%' },
+    '50%': { backgroundPosition: '100% 50%' }
+  },
+
