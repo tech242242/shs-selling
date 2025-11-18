@@ -16,7 +16,6 @@ export default function Navbar() {
     { name: "Casual", link: "/categories/casual", icon: "👞" },
   ];
 
-  // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -34,8 +33,8 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-
-        {/* 🔥 LOGO */}
+        
+        {/* LOGO */}
         <Link to="/" className="flex items-center gap-3 group">
           <div className="relative">
             <div className="w-10 h-10 bg-gradient-to-r from-red-600 to-purple-600 rounded-xl rotate-45 transition-all duration-500 group-hover:rotate-90"></div>
@@ -47,7 +46,7 @@ export default function Navbar() {
           </h1>
         </Link>
 
-        {/* 🌐 DESKTOP MENU */}
+        {/* DESKTOP MENU */}
         <ul className="hidden lg:flex items-center gap-1 bg-white/5 rounded-2xl px-2 py-1 border border-white/10 shadow-md backdrop-blur-xl">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.link;
@@ -67,17 +66,15 @@ export default function Navbar() {
                   <span>{item.name}</span>
 
                   {isActive && (
-                    <div className="absolute bottom-1 left-1/2 w-2 h-2 bg-white rounded-full -translate-x-1/2 animate-pulse"></div>
+                    <div className="absolute bottom-1 left-1/2 w-2 h-2 bg-white rounded-full -translate-x-1/2 animate-ping"></div>
                   )}
-
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-all"></div>
                 </Link>
               </li>
             );
           })}
         </ul>
 
-        {/* 📱 MOBILE MENU BUTTON */}
+        {/* MOBILE MENU BUTTON */}
         <button
           className="lg:hidden w-12 h-12 flex flex-col justify-center items-center bg-white/10 rounded-xl border border-white/20 hover:border-red-500/50 transition-all"
           onClick={() => setOpen(!open)}
@@ -100,13 +97,12 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* 📱 MOBILE MENU */}
+      {/* MOBILE MENU */}
       {open && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-white/10 shadow-xl animate-fade-in-up">
+        <div className="lg:hidden animate-slideDown bg-black/95 backdrop-blur-xl border-b border-white/10 shadow-xl">
           <div className="p-4 space-y-2">
             {menuItems.map((item) => {
               const isActive = location.pathname === item.link;
-
               return (
                 <Link
                   key={item.name}
@@ -120,9 +116,7 @@ export default function Navbar() {
                   }`}
                 >
                   <span className="text-xl">{item.icon}</span>
-                  <span className="text-white text-lg font-semibold">
-                    {item.name}
-                  </span>
+                  <span className="text-white text-lg font-semibold">{item.name}</span>
                 </Link>
               );
             })}
